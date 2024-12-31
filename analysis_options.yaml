@@ -1,0 +1,12 @@
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - lib/generated_plugin_registrant.dart
+    - lib/**/*.g.dart
+    - lib/**/app_router.gr.dart
+    - lib/generated/**.dart
+    - lib/**/*.freezed.dart
+    - lib/generated_plugin_registrant.dart
+    - test/generated_migrations/schema**.dart
