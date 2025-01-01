@@ -1,17 +1,21 @@
 import 'package:postgres/postgres.dart';
 
+import '../exceptions/exceptions.dart';
 import '../models/slot.dart';
-import 'exceptions.dart';
 
 class BookingRepository {
   final Connection connection;
 
   BookingRepository(this.connection);
 
-  Future<List<Slot>> getAvailableSlots(String date) async {
+  Future<List<Slot>> getAvailableSlots(String? date) async {
     try {
-      if (date.trim().isEmpty) {
+      if ((date ?? '').trim().isEmpty) {
         throw RequestException('Date parameter is required.');
+      }
+
+      if (!isValidDateFormat(date)) {
+        throw RequestException('Invalid date format.');
       }
 
       final result = await connection.execute(
@@ -108,5 +112,14 @@ class BookingRepository {
     print('Error: invalid date format - ${value.runtimeType}');
 
     throw BookingException('Invalid date format.');
+  }
+
+  bool isValidDateFormat(String? date) {
+    if (date != null) {
+      final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+      return regex.hasMatch(date);
+    }
+
+    return false;
   }
 }

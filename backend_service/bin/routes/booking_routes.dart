@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import '../exceptions/exceptions.dart';
 import '../repositories/booking_repository.dart';
-import '../repositories/exceptions.dart';
+import '../utils/api/api_response.dart';
 
 class BookingRoutes {
-  final BookingRepository repo;
-  BookingRoutes(this.repo);
+  final BookingRepository repository;
+
+  BookingRoutes(this.repository);
 
   Router get router {
     final router = Router();
@@ -19,32 +21,13 @@ class BookingRoutes {
         try {
           final dateParam = request.url.queryParameters['date'];
 
-          if (dateParam == null) {
-            return Response(
-              400,
-              body: json.encode({'error': 'Date parameter is required'}),
-              headers: {'content-type': 'application/json'},
-            );
-          }
+          final slots = await repository.getAvailableSlots(dateParam);
 
-          final slots = await repo.getAvailableSlots(dateParam);
-
-          return Response.ok(
-            json.encode({'data': slots.map((s) => s.toJson()).toList()}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.ok(slots.map((s) => s.toJson()).toList());
         } on RequestException catch (e) {
-          return Response(
-            400,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.badRequest(e.message);
         } on BookingException catch (e) {
-          return Response(
-            500,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.serverError(e.message);
         }
       },
     );
@@ -56,45 +39,22 @@ class BookingRoutes {
           final body = await request.readAsString();
           final Map<String, dynamic> data = json.decode(body);
 
-          final slot = await repo.bookSlot(
+          final slot = await repository.bookSlot(
             int.parse(slotId),
             data['name'],
           );
 
-          return Response.ok(
-            json.encode({'data': slot.toJson()}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.ok(slot.toJson());
         } on FormatException catch (_) {
-          return Response(
-            400,
-            body: json.encode({'error': 'Invalid request format'}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.badRequest('Invalid request format');
         } on RequestException catch (e) {
-          return Response(
-            400,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.validationError(e.message);
         } on NotFoundException catch (e) {
-          return Response(
-            404,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.notFound(e.message);
         } on ConflictException catch (e) {
-          return Response(
-            409,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.conflict(e.message);
         } on BookingException catch (e) {
-          return Response(
-            500,
-            body: json.encode({'error': e.message}),
-            headers: {'content-type': 'application/json'},
-          );
+          return ApiResponse.serverError(e.message);
         }
       },
     );

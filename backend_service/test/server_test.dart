@@ -1,11 +1,11 @@
-import '../bin/repositories/booking_repository.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
-import '../bin/models/slot.dart';
-import '../bin/repositories/exceptions.dart';
 
+import '../bin/exceptions/exceptions.dart';
+import '../bin/models/slot.dart';
+import '../bin/repositories/booking_repository.dart';
 import 'mock_result.dart';
 import 'server_test.mocks.dart';
 
