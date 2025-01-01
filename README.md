@@ -47,8 +47,6 @@ To generate a test coverage report, execute the following script:
 
 | **Name**                | **Description**                                  |
 |--------------------------|--------------------------------------------------|
-| **flutter_test**         | Framework for writing unit and widget tests     |
-| **flutter_lints**        | Official Flutter lint rules                     |
 | **build_runner**         | Code generation utility for Dart projects       |
 | **auto_route_generator** | Generates route navigation code using `auto_route` |
 | **freezed**              | Code generator for `freezed_annotation`         |
