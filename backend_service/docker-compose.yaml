@@ -4,6 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: enpal-coding-challenge-db
+    environment:
+      - POSTGRES_DB=coding-challenge
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypassword123!
     ports:
       - "5432:5432"
     volumes:
